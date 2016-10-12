@@ -71,14 +71,15 @@ class MongoSpoutTask implements Callable<Boolean>, Runnable, Serializable {
             .sort(new BasicDBObject("$natural", 1))
             .addOption(Bytes.QUERYOPTION_TAILABLE)
             .addOption(Bytes.QUERYOPTION_AWAITDATA)
-            .addOption(Bytes.QUERYOPTION_NOTIMEOUT).batchSize(1000);
+            .addOption(Bytes.QUERYOPTION_NOTIMEOUT)
+            .batchSize(10000);
 
     // While the thread is set to running
     while (running.get()) {
       try {
         // Check if we have a next item in the collection
         if (this.cursor.hasNext()) {
-          if (LOG.isInfoEnabled()) LOG.info("Fetching a new item from MongoDB cursor");
+          if (LOG.isDebugEnabled()) LOG.debug("Fetching a new item from MongoDB cursor");
           // Fetch the next object and push it on the queue
           this.queue.put(this.cursor.next());
         } else {
